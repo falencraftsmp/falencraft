@@ -32,12 +32,27 @@ body{
 h1{
   font-family:'Minecrafter',sans-serif;
   font-size:2.6em;
-  margin-bottom:25px;
+  margin-bottom:10px;
   text-shadow:0 6px 25px rgba(0,0,0,.9);
 }
 
 .brand{ color:#ff9f1c; }
 .white{ color:#ffffff; }
+
+/* STATUS DEWA */
+#serverStatusTop{
+  margin-bottom:18px;
+  font-weight:bold;
+  animation:pulse 1.5s infinite;
+}
+#serverStatusTop.online{ color:#00ff6a; }
+#serverStatusTop.offline{ color:#ff4d4d; }
+
+@keyframes pulse{
+  0%{ text-shadow:0 0 0 rgba(0,255,100,.3);}
+  50%{ text-shadow:0 0 12px rgba(0,255,100,.9);}
+  100%{ text-shadow:0 0 0 rgba(0,255,100,.3);}
+}
 
 .card{
   background:rgba(0,0,0,.6);
@@ -158,6 +173,9 @@ h1{
   <span class="white"> | Minecraft Server</span>
 </h1>
 
+<!-- STATUS PINDAH KE SINI -->
+<div id="serverStatusTop">Memuat status server...</div>
+
 <div class="card">
 
   <div class="edition-title">📱 BEDROCK EDITION</div>
@@ -224,9 +242,32 @@ function copyText(id){
   const toast = document.getElementById("toast");
   toast.innerText = el.value + " disalin!";
   toast.classList.add("show");
-
   setTimeout(()=>toast.classList.remove("show"),1500);
 }
+
+/* STATUS SERVER (IP TERPISAH) */
+const api = "https://api.mcsrvstat.us/2/game-gnl-jh2.raznar.net:25145";
+
+function updateStatus(){
+  fetch(api)
+    .then(r=>r.json())
+    .then(d=>{
+      const s = document.getElementById("serverStatusTop");
+      if(d.online){
+        s.innerText = `🟢 Online • ${d.players.online} / ${d.players.max} pemain`;
+        s.className = "online";
+      }else{
+        s.innerText = "🔴 Offline";
+        s.className = "offline";
+      }
+    })
+    .catch(()=>{
+      document.getElementById("serverStatusTop").innerText="⚠️ Status error";
+    });
+}
+
+updateStatus();
+setInterval(updateStatus,10000);
 </script>
 
 </body>
